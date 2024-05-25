@@ -7,5 +7,5 @@ config = {
     'batch_size': 256,
     'learning_rate': 1e-5,
     'early_stop': 400,  # If model has not improved for this many consecutive epochs, stop training.
-    'save_path': './models/model-adam.ckpt'
+    'save_path': './models/model-sgd.ckpt'
 }

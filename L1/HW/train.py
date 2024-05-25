@@ -18,15 +18,15 @@ def train(train_loader, valid_loader, model, config, device):
     # Define your optimization algorithm.
     # TODO: Please check https://pytorch.org/docs/stable/optim.html to get more available algorithms.
     # TODO: L2 regularization (optimizer(weight decay...) or implement by your self).
-    # optimizer = torch.optim.SGD(model.parameters(), lr=config['learning_rate'], momentum=0.9)
-    optimizer = torch.optim.Adam(model.parameters(), lr=config.learning_rate, weight_decay=1e-5)
+    optimizer = torch.optim.SGD(model.parameters(), lr=config['learning_rate'], momentum=0.9)
+    # optimizer = torch.optim.Adam(model.parameters(), lr=config['learning_rate'], weight_decay=1e-5)
 
     writer = SummaryWriter()
 
     if not os.path.isdir('./models'):
         os.mkdir('./models')  # Create directory of saving models.
 
-    n_epochs, best_loss, step, early_stop_count = config.n_epochs, math.inf, 0, 0
+    n_epochs, best_loss, step, early_stop_count = config['n_epochs'], math.inf, 0, 0
 
     for epoch in range(n_epochs):
         model.train()  # Set your model to train mode.
@@ -62,7 +62,7 @@ def train(train_loader, valid_loader, model, config, device):
             loss_record.append(loss.item())
 
         mean_valid_loss = sum(loss_record) / len(loss_record)
-        print(f'Epoch [{epoch + 1}/{n_epochs}]: Train loss: {mean_train_loss:.4f}, Valid loss: {mean_valid_loss:.4f}')
+        # print(f'Epoch [{epoch + 1}/{n_epochs}]: Train loss: {mean_train_loss:.4f}, Valid loss: {mean_valid_loss:.4f}')
         writer.add_scalar('Loss/valid', mean_valid_loss, step)
 
         if mean_valid_loss < best_loss:
@@ -95,5 +95,5 @@ train_dataset, valid_dataset = COVID19Dataset(x_train, y_train), COVID19Dataset(
 train_loader = DataLoader(train_dataset, batch_size=config['batch_size'], shuffle=True, pin_memory=True)
 valid_loader = DataLoader(valid_dataset, batch_size=config['batch_size'], shuffle=True, pin_memory=True)
 
-model = COVIDModel(input_size=x_train.shape[1]).to(config.device)
-train(train_loader, valid_loader, model, config, config.device)
+model = COVIDModel(input_size=x_train.shape[1]).to(device)
+train(train_loader, valid_loader, model, config, device)

@@ -18,7 +18,7 @@ def save_pred(preds, file):
 
 
 train_data, valid_data, test_data = data.read_data()
-x_train, x_valid, x_test, y_train, y_valid = select_feat(train_data, valid_data, test_data)
+x_train, x_valid, x_test, y_train, y_valid = data.select_feat(train_data, valid_data, test_data)
 
 test_dataset = COVID19Dataset(x_test)
 test_loader = DataLoader(test_dataset, batch_size=config['batch_size'], shuffle=False, pin_memory=True)
