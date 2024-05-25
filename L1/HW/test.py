@@ -23,7 +23,7 @@ x_train, x_valid, x_test, y_train, y_valid = select_feat(train_data, valid_data,
 test_dataset = COVID19Dataset(x_test)
 test_loader = DataLoader(test_dataset, batch_size=config['batch_size'], shuffle=False, pin_memory=True)
 
-model = COVIDModel(input_size=x_train.shape[1]).to(config.device)
+model = COVIDModel(input_size=x_train.shape[1]).to(device)
 model.load_state_dict(torch.load(config['save_path']))
 preds = predict(test_loader, model, device)
 save_pred(preds, 'predict.csv')

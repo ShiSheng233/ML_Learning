@@ -32,10 +32,3 @@ def predict(test_loader, model, device):
             preds.append(pred.detach().cpu())
     preds = torch.cat(preds, dim=0).numpy()
     return preds
-
-
-def select_feat(train_data, valid_data, test_data):
-    y_train, y_valid = train_data[:, -1], valid_data[:, -1]
-    raw_x_train, raw_x_valid, raw_x_test = train_data[:, :-1], valid_data[:, :-1], test_data
-
-    return raw_x_train, raw_x_valid, raw_x_test, y_train, y_valid
