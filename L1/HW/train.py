@@ -13,26 +13,23 @@ import data
 
 
 def train(train_loader, valid_loader, model, config, device):
-    criterion = nn.MSELoss(reduction='mean')  # Define your loss function, do not modify this.
+    criterion = nn.MSELoss(reduction='mean')
 
-    # Define your optimization algorithm.
-    # TODO: Please check https://pytorch.org/docs/stable/optim.html to get more available algorithms.
-    # TODO: L2 regularization (optimizer(weight decay...) or implement by your self).
+    # https://pytorch.org/docs/stable/optim.html
     optimizer = torch.optim.SGD(model.parameters(), lr=config['learning_rate'], momentum=0.9)
     # optimizer = torch.optim.Adam(model.parameters(), lr=config['learning_rate'], weight_decay=1e-5)
 
     writer = SummaryWriter()
 
     if not os.path.isdir('./models'):
-        os.mkdir('./models')  # Create directory of saving models.
+        os.mkdir('./models')
 
     n_epochs, best_loss, step, early_stop_count = config['n_epochs'], math.inf, 0, 0
 
     for epoch in range(n_epochs):
-        model.train()  # Set your model to train mode.
+        model.train()
         loss_record = []
 
-        # tqdm is a package to visualize your training progress.
         train_pbar = tqdm(train_loader, position=0, leave=True)
 
         for x, y in train_pbar:
@@ -65,17 +62,10 @@ def train(train_loader, valid_loader, model, config, device):
         # print(f'Epoch [{epoch + 1}/{n_epochs}]: Train loss: {mean_train_loss:.4f}, Valid loss: {mean_valid_loss:.4f}')
         writer.add_scalar('Loss/valid', mean_valid_loss, step)
 
-        if mean_valid_loss < best_loss:
+        if mean_valid_loss < best_loss:  # Save best model
             best_loss = mean_valid_loss
-            torch.save(model.state_dict(), config['save_path'])  # Save your best model
-            # print('Saving model with loss {:.3f}...'.format(best_loss))
-            early_stop_count = 0
-        else:
-            early_stop_count += 1
-
-        if early_stop_count >= config['early_stop']:
-            print('\nModel is not improving, saved with loss {:.3f}'.format(best_loss))
-            return
+            torch.save(model.state_dict(), config['save_path'])
+            print('Saving model with loss {:.3f}...'.format(best_loss))
 
 
 same_seed(config['seed'])
@@ -97,3 +87,13 @@ valid_loader = DataLoader(valid_dataset, batch_size=config['batch_size'], shuffl
 
 model = COVIDModel(input_size=x_train.shape[1]).to(device)
 train(train_loader, valid_loader, model, config, device)
+
+if config['test_after_training']:
+    test_dataset = COVID19Dataset(x_test)
+    test_loader = DataLoader(test_dataset, batch_size=config['batch_size'], shuffle=False, pin_memory=True)
+
+    model = COVIDModel(input_size=x_train.shape[1]).to(device)
+    model.load_state_dict(torch.load(config['save_path']))
+    preds = predict(test_loader, model, device)
+    import test
+    test.save_pred(preds, 'predict.csv')

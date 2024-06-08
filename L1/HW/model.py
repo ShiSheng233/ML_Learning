@@ -1,15 +1,15 @@
 import torch.nn as nn
 
 
-# Linear, Sigmoid
+# Linear, ReLU
 class COVIDModel(nn.Module):
     def __init__(self, input_size):
         super(COVIDModel, self).__init__()
         self.layers = nn.Sequential(
-            nn.Linear(input_size, 32),
-            nn.Sigmoid(),
-            nn.Linear(32, 4),
-            nn.Sigmoid(),
+            nn.Linear(input_size, 16),
+            nn.ReLU(),
+            nn.Linear(16, 4),
+            nn.ReLU(),
             nn.Linear(4, 1)
         )
 
